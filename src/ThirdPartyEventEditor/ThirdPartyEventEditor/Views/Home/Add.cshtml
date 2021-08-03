@@ -1,0 +1,39 @@
+﻿
+@{
+    ViewBag.Title = "Create event";
+}
+@model ThirdPartyEventEditor.Models.ThirdPartyEvent
+
+<h2>Add Event</h2>
+
+@using (Html.BeginForm("Add", "Home", FormMethod.Post))
+{
+<fieldset>
+    <p>
+        @Html.LabelFor(m => m.Name, "Event name")
+        <br />
+        @Html.EditorFor(m => m.Name, new { htmlAttributes = new { @class = "form-control" } })
+    </p>
+    <p>
+        @Html.LabelFor(m => m.Description, "Event description")
+        <br />
+        @Html.EditorFor(m => m.Description, new { htmlAttributes = new { @class = "form-control" } })
+    </p>
+    <p>
+        @Html.LabelFor(m => m.PosterImage, "Image")
+        <br />
+        @Html.EditorFor(m => m.PosterImage, new { htmlAttributes = new { @class = "form-control" } })
+    </p>
+    <p>
+        @Html.LabelFor(m => m.StartDate, "Start date")
+        <br />
+        <input type="datetime-local" id="startdate" name="StartDate" class="form-control"/>
+    </p>
+    <p>
+        @Html.LabelFor(m => m.EndDate, "End date")
+        <br />
+        <input type="datetime-local" id="enddate" name="EndDate" class="form-control"/>
+    </p>
+    <input type="submit" value="Отправить" />
+</fieldset>
+}

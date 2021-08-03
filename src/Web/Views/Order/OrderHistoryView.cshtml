@@ -1,0 +1,48 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model IEnumerable<Web.ViewModel.OrderHistoryViewModel>
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+
+<table class="table">
+    <tr>
+        <th>
+            <label for="Event-Description">@localizer["Description"]</label>
+        </th>
+        <th>
+            <label for="Order-time">@localizer["OrderTime"]</label>
+        </th>
+        <th>
+            <label for="Event-Seat-Row">@localizer["Row"]</label>
+        </th>
+        <th>
+            <label for="Event-Seat-Number">@localizer["Number"]</label>
+        </th>
+        <th>
+            <label for="Price">@localizer["Price"]</label>
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Row)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Number)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+        </tr>
+    }
+</table>

@@ -1,0 +1,102 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    string str = @localizer["ProceedToCheckout"].Value;
+}
+@model Web.ViewModel.EventViewModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+
+<head>
+    <link type="text/css" rel="stylesheet" href="../wwwroot/css/site.css" />
+</head>
+
+<h2 class="text-center">@localizer["BuyingATicket"]</h2>
+<h4 class="text-center">@Model.Description</h4>
+<h5 class="text-center">@Model.StartTime - @Model.EndTime</h5>
+<div style="text-align: center">
+    <svg id="layoutMap" class="bi bi-align-center" width="80%" height="450">
+        @foreach (var area in Model.EventAreas)
+        {
+            foreach (var seat in Model.EventSeats.Where(es => es.EventAreaId == area.Id && es.State == 0))
+            {
+                <g class="available-seats" fill="#fff">
+                    <g stroke="#62c065">
+                        <rect class="rectAvailable" id="seat-id-@seat.Id" x="@(((area.CoordX + 1) * 45) + (seat.Number - 1) * 45)" y="@(((area.CoordY + 1) * 45) + (seat.Row - 1) * 45)" width="40" height="40" fill="#ffffff" onclick="ChangeToPayButton(@seat.Id, @area.Price, $(this).attr('fill')); ">
+                        </rect>
+                    </g>
+                </g>
+            }
+            foreach (var seat in Model.EventSeats.Where(es => es.EventAreaId == area.Id && es.State == 1))
+            {
+                <g fill="#fff">
+                    <g stroke="#ff0000">
+                        <rect x="@(((area.CoordX + 1) * 45) + (seat.Number - 1) * 45)" y="@(((area.CoordY + 1) * 45) + (seat.Row - 1) * 45)" width="40" height="40" fill="#fff">
+                        </rect>
+                    </g>
+                </g>
+            }
+        }
+    </svg>
+</div>
+
+<button id="to-pay" class="btn btn-danger"></button>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            HideToPayButton();
+        })
+    </script>
+
+<script>
+    function HideToPayButton() {
+        $(('#to-pay')).hide();
+    }
+</script>
+    <script>
+        window.onload = function() {
+            var el = document.getElementById('to-pay');
+            el.addEventListener("click", TicketsPay);
+        }
+    function TicketsPay() {
+        $.post('@Url.Action("Purchase", "Order")', {
+            eventSeatIds: seatslist
+        },
+            function () {
+                $('#to-pay').html('"Purchase()" successfully called.');
+            }).done(function(){
+        window.location.href='@Url.Action("Index", "Home")';
+   });
+    };
+    </script>
+
+    <script>
+        let totalPrice = 0.0;
+        var seatslist = [];
+
+        function ChangeToPayButton(seatId, areaPrice, fill) {
+            if (fill != "#00ff00") {
+                $(document.getElementById('seat-id-' + seatId)).attr('fill', '#00ff00');
+                $(('#to-pay')).show();
+                seatslist.push(seatId);
+                totalPrice += areaPrice;
+                $('#to-pay').html("@str " + totalPrice + "USD");
+            } else {
+                $(document.getElementById('seat-id-' + seatId)).attr('fill', '#ffffff');
+
+                var index = seatslist.indexOf(seatId);
+                if (index !== -1) {
+                    seatslist.splice(index, 1);
+                }
+
+                totalPrice -= areaPrice;
+                $('#to-pay').html("@str " + totalPrice + "USD");
+                if (totalPrice <= 0) {
+                    HideToPayButton();
+                }
+            }
+        }
+    </script>
+}

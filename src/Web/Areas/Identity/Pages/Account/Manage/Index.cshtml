@@ -1,0 +1,79 @@
+﻿@page
+@model IndexModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<h4>@ViewData["Title"]</h4>
+
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Options
+@using Web.Models
+
+@inject UserManager<ApplicationUser> UserManager
+@inject IViewLocalizer Localizer
+@inject IOptions<RequestLocalizationOptions> LocOptions
+@{
+    var requestCulture = HttpContext.Features.Get<IRequestCultureFeature>();
+    var cultureItems = LocOptions.Value.SupportedUICultures
+        .Select(c => new SelectListItem { Value = c.Name, Text = c.NativeName })
+        .ToList();
+    cultureItems = cultureItems.Select(ci => ci.Value == "ru-RU" ? new SelectListItem { Value = ci.Value, Text = "Беларускi" } : ci).ToList();
+
+    var returnUrl = string.IsNullOrEmpty(HttpContext.Request.Path) ? "~/" : $"~{HttpContext.Request.Path.Value}{HttpContext.Request.QueryString}";
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="row">
+    <div class="col">
+        <form id="profile-form" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Input.FirstName"></label>
+                <input asp-for="Input.FirstName" class="form-control" />
+                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Surname"></label>
+                <input asp-for="Input.Surname" class="form-control" />
+                <span asp-validation-for="Input.Surname" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.Language"></label>
+                <select asp-for="Input.Language"
+                        asp-items="cultureItems"
+                        class="form-control">
+                    <option>Please select one</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Username"></label>
+                <input asp-for="Username" class="form-control" disabled />
+            </div>
+            <button id="update-profile-button" type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+    <div class="col">
+        <form action="~/Users/TopUpBalance">
+            <div>
+                <label>@localizer["Balance"]: @((await UserManager.GetUserAsync(User)).Balance)USD</label>
+                <button class="btn btn-success">+</button>
+            </div>
+        </form>
+    </div>
+    <div class="col">
+        <a asp-controller="Order" asp-action="OrderHistoryView">
+            <input type="button" class="btn btn-dark" value="@localizer["SeeOrderHistory"]"/>
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

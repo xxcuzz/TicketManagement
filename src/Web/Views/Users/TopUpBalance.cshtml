@@ -1,0 +1,26 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@using System.Globalization
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+
+<h2 class="text-center">@localizer["TopUpBalance"]</h2>
+<form method="post" asp-action="TopUpBalance">
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="p-2 bd-highlight col-example">
+            <label>@localizer["EnterAmountOfMoney"]</label>
+        </div>
+
+        <div class="p-2 bd-highlight col-example">
+            @{string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+                string holder = "0" + separator + "00";}
+            <input placeholder="@holder" name="balance" class="form-control set-decimal-number" min="0" step="0.01" />
+        </div>
+
+        <div class="p-2 bd-highlight col-example">
+            <input type="submit" value="@localizer["Confirm"]" />
+        </div>
+    </div>
+</form>

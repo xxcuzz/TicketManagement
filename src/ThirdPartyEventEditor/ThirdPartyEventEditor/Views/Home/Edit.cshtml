@@ -1,0 +1,41 @@
+﻿@model ThirdPartyEventEditor.Models.ThirdPartyEvent
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm("Edit", "Home", FormMethod.Post))
+{
+    <fieldset>
+        <p>
+            @Html.HiddenFor(modelItem => Model.PrimaryKey)
+        </p>
+        <p>
+            @Html.LabelFor(m => m.Name, "Event name", htmlAttributes: new { @class = "control-label" })
+            <br />
+            @Html.EditorFor(m => m.Name, new { htmlAttributes = new { @class = "form-control" } })
+        </p>
+        <p>
+            @Html.LabelFor(m => m.Description, "Event description", htmlAttributes: new { @class = "control-label" })
+            <br />
+            @Html.EditorFor(m => m.Description, new { htmlAttributes = new { @class = "form-control" } })
+        </p>
+        <p>
+            @Html.LabelFor(m => m.PosterImage, "Image", htmlAttributes: new { @class = "control-label" })
+            <br />
+            @Html.EditorFor(m => m.PosterImage, new { htmlAttributes = new { @class = "form-control" } })
+        </p>
+        <p>
+            @Html.LabelFor(m => m.StartDate, "Start date", htmlAttributes: new { @class = "control-label" })
+            <br />
+            <input type="datetime-local" id="startdate" name="StartDate" class="form-control" />
+        </p>
+        <p>
+            @Html.LabelFor(m => m.EndDate, "End date", htmlAttributes: new { @class = "control-label" })
+            <br />
+            <input type="datetime-local" id="enddate" name="EndDate" class="form-control"/>
+        </p>
+        <input type="submit" value="Отправить" />
+    </fieldset>
+}

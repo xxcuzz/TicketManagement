@@ -1,0 +1,7 @@
+﻿CREATE TABLE [dbo].[UserTicket]
+(
+	[Id] INT IDENTITY PRIMARY KEY,
+	[UserId] NVARCHAR(450) NOT NULL,
+	[SeatId] int NOT NULL,
+	[PurchaseTime] DATETIME NOT NULL
+)
