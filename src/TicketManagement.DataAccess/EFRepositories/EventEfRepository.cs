@@ -57,7 +57,18 @@ namespace TicketManagement.DataAccess.EFRepositories
         {
             try
             {
-                await _db.Database.ExecuteSqlInterpolatedAsync($"EXEC dbo.UpdateEvent {item.Id}, {item.Name}, {item.Description}, {item.LayoutId}, {item.EventStart}, {item.EventEnd}, {item.Image}");
+                var eventFromDb = _db.Event.Find(item.Id);
+
+                if (eventFromDb.LayoutId == item.LayoutId)
+                {
+                    await _db.Database.ExecuteSqlInterpolatedAsync($"EXEC dbo.UpdateEvent {item.Id}, {item.Name}, {item.Description}, {item.LayoutId}, {item.EventStart}, {item.EventEnd}, {item.Image}");
+                }
+                else
+                {
+                    await DeleteAsync(eventFromDb);
+                    await AddAsync(item);
+                }
+
                 return true;
             }
             catch (Exception)

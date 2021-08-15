@@ -55,22 +55,41 @@ namespace TicketManagement.DataAccess.AdoRepositories
 
         public async Task<bool> UpdateAsync(Event item)
         {
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            var command = new SqlCommand("dbo.UpdateEvent", connection)
+            try
             {
-                CommandType = CommandType.StoredProcedure,
-                CommandText = "UpdateEvent",
-            };
-            command.Parameters.AddWithValue("@Id", item.Id);
-            command.Parameters.AddWithValue("@Name", item.Name);
-            command.Parameters.AddWithValue("@Description", item.Description);
-            command.Parameters.AddWithValue("@LayoutId", item.LayoutId);
-            command.Parameters.AddWithValue("@EventStart", item.EventStart);
-            command.Parameters.AddWithValue("@EventEnd", item.EventEnd);
-            command.Parameters.AddWithValue("@Image", item.Image);
+                using var connection = new SqlConnection(_connectionString);
+                await connection.OpenAsync();
 
-            return await command.ExecuteNonQueryAsync() > 0;
+                var eventFromDb = await GetByIdAsync(item.Id);
+
+                if (eventFromDb.LayoutId == item.LayoutId)
+                {
+                    var command = new SqlCommand("dbo.UpdateEvent", connection)
+                    {
+                        CommandType = CommandType.StoredProcedure,
+                        CommandText = "UpdateEvent",
+                    };
+                    command.Parameters.AddWithValue("@Id", item.Id);
+                    command.Parameters.AddWithValue("@Name", item.Name);
+                    command.Parameters.AddWithValue("@Description", item.Description);
+                    command.Parameters.AddWithValue("@LayoutId", item.LayoutId);
+                    command.Parameters.AddWithValue("@EventStart", item.EventStart);
+                    command.Parameters.AddWithValue("@EventEnd", item.EventEnd);
+                    command.Parameters.AddWithValue("@Image", item.Image);
+                    await command.ExecuteNonQueryAsync();
+                }
+                else
+                {
+                    await DeleteAsync(eventFromDb);
+                    await AddAsync(item);
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public IQueryable<Event> GetAll()
@@ -110,20 +129,27 @@ namespace TicketManagement.DataAccess.AdoRepositories
 
             using var command = new SqlCommand(createCommand, connection);
             command.Parameters.AddWithValue("@id", id);
-            var reader = await command.ExecuteReaderAsync();
-
-            var event1 = new Event
+            using var reader = await command.ExecuteReaderAsync();
+            Event event1;
+            while (reader.Read())
             {
-                Id = Convert.ToInt32(reader["Id"]),
-                Name = Convert.ToString(reader["Name"]),
-                Description = Convert.ToString(reader["Description"]),
-                LayoutId = Convert.ToInt32(reader["LayoutId"]),
-                EventStart = Convert.ToDateTime(reader["EventStart"]),
-                EventEnd = Convert.ToDateTime(reader["EventEnd"]),
-                Image = Convert.ToString(reader["Image"]),
-            };
+                event1 = new Event
+                {
+                    Id = Convert.ToInt32(reader["Id"]),
+                    Name = Convert.ToString(reader["Name"]),
+                    Description = Convert.ToString(reader["Description"]),
+                    LayoutId = Convert.ToInt32(reader["LayoutId"]),
+                    EventStart = Convert.ToDateTime(reader["EventStart"]),
+                    EventEnd = Convert.ToDateTime(reader["EventEnd"]),
+                    Image = Convert.ToString(reader["Image"]),
+                };
 
-            return event1;
+#pragma warning disable S1751 // Loops with at most one iteration should be refactored
+                return event1;
+#pragma warning restore S1751 // Loops with at most one iteration should be refactored
+            }
+
+            return null;
         }
     }
 }

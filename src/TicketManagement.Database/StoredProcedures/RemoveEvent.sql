@@ -17,3 +17,22 @@ AS
                 DELETE FROM EventArea WHERE EventArea.EventId=@Id
 
                 DELETE FROM Event WHERE Event.Id=@Id
+
+                
+                DECLARE @maxSeat INT
+                SELECT @maxSeat=max([Id]) FROM EventSeat
+                IF @maxSeat IS NULL   --check when max is returned as null
+                    SET @maxSeat = 0
+                DBCC CHECKIDENT ('EventSeat', RESEED, @maxSeat)
+
+                DECLARE @maxArea INT
+                SELECT @maxArea=max([Id]) FROM EventArea
+                IF @maxArea IS NULL   --check when max is returned as null
+                    SET @maxArea = 0
+                DBCC CHECKIDENT ('EventArea', RESEED, @maxArea)
+
+                DECLARE @maxEvent INT
+                SELECT @maxEvent=max([Id]) FROM Event
+                IF @maxEvent IS NULL   --check when max is returned as null
+                    SET @maxEvent = 0
+                DBCC CHECKIDENT ('Event', RESEED, @maxEvent)

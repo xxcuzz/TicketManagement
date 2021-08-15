@@ -243,7 +243,7 @@ namespace TicketManagement.IntegrationTests
 
             var event2 = new Event
             {
-                Id = 4,
+                Id = 3,
                 Description = "Updated",
                 LayoutId = layout1.Id,
                 Name = "Cinema",
@@ -261,7 +261,7 @@ namespace TicketManagement.IntegrationTests
             using var connection = new SqlConnection(_connectionString);
             connection.Open();
 
-            var command = new SqlCommand($"SELECT Description FROM Event WHERE Id = 4", connection);
+            var command = new SqlCommand($"SELECT Description FROM Event WHERE Id = 3", connection);
             var eventDescriptions = new List<string>();
 
             var reader = command.ExecuteReader();
@@ -279,7 +279,7 @@ namespace TicketManagement.IntegrationTests
             using var connection = new SqlConnection(_connectionString);
             connection.Open();
 
-            var command = new SqlCommand($"SELECT Count(Id) FROM EventSeat WHERE EventAreaId = 4", connection);
+            var command = new SqlCommand($"SELECT Count(Id) FROM EventSeat WHERE EventAreaId = 5", connection);
             var result = (int)command.ExecuteScalar();
 
             Assert.AreEqual(1, result);
@@ -291,7 +291,7 @@ namespace TicketManagement.IntegrationTests
             using var connection = new SqlConnection(_connectionString);
             connection.Open();
 
-            var command = new SqlCommand($"SELECT Count(Id) FROM Event WHERE Id = 3", connection);
+            var command = new SqlCommand($"SELECT Count(Id) FROM Event WHERE DESCRIPTION = 'Joker' AND Id = 3 ", connection);
 
             int eventExist = (int)command.ExecuteScalar();
 
