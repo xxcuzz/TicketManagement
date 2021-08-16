@@ -1,36 +1,43 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using TicketManagement.DataAccess.AdoRepositories;
+using TicketManagement.DataAccess.Context;
 using TicketManagement.DataAccess.DataBase;
+using TicketManagement.DataAccess.EFRepositories;
 using TicketManagement.DataAccess.Entities;
 
 namespace TicketManagement.IntegrationTests
 {
-    public class EventsTests
+    public class EFRepoTests : IDisposable
     {
         private static readonly string _connectionString = Configurator.GetTestConnString();
-        private EventRepository _eventRepo;
-        private VenueRepository _venueRepo;
-        private AreaRepository _areaRepo;
-        private LayoutRepository _layoutRepo;
-        private SeatRepository _seatRepo;
-        private EventAreaRepository _eventAreaRepo;
-        private EventSeatRepository _eventSeatRepo;
+        private EventEfRepository _eventRepo;
+        private EfRepository<Area> _areaRepo;
+        private EfRepository<Venue> _venueRepo;
+        private EfRepository<Layout> _layoutRepo;
+        private EfRepository<Seat> _seatRepo;
+        private EfRepository<EventArea> _eventAreaRepo;
+        private EfRepository<EventSeat> _eventSeatRepo;
+        private TicketDbContext _context;
 
         [SetUp]
         public void Setup()
         {
-            _eventRepo = new EventRepository(_connectionString);
-            _venueRepo = new VenueRepository(_connectionString);
-            _areaRepo = new AreaRepository(_connectionString);
-            _layoutRepo = new LayoutRepository(_connectionString);
-            _seatRepo = new SeatRepository(_connectionString);
-            _eventAreaRepo = new EventAreaRepository(_connectionString);
-            _eventSeatRepo = new EventSeatRepository(_connectionString);
+            var options = new DbContextOptionsBuilder<TicketDbContext>()
+                .UseSqlServer(_connectionString)
+                .Options;
+            _context = new TicketDbContext(options);
+            _eventRepo = new EventEfRepository(_context);
+            _venueRepo = new EfRepository<Venue>(_context);
+            _areaRepo = new EfRepository<Area>(_context);
+            _layoutRepo = new EfRepository<Layout>(_context);
+            _seatRepo = new EfRepository<Seat>(_context);
+            _eventAreaRepo = new EfRepository<EventArea>(_context);
+            _eventSeatRepo = new EfRepository<EventSeat>(_context);
             ClearDb();
             InitializeFields().Wait();
         }
@@ -256,49 +263,6 @@ namespace TicketManagement.IntegrationTests
         }
 
         [Test]
-        public void UpdateEvent_ShouldReturn_UpdatedEventDescription()
-        {
-            using var connection = new SqlConnection(_connectionString);
-            connection.Open();
-
-            var command = new SqlCommand($"SELECT Description FROM Event WHERE Id = 3", connection);
-            var eventDescriptions = new List<string>();
-
-            var reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                eventDescriptions.Add(Convert.ToString(reader["Description"]));
-            }
-
-            Assert.AreEqual("Updated", eventDescriptions[0]);
-        }
-
-        [Test]
-        public void UpdateEvent_ShouldReturn_RightCountOfEventSeats()
-        {
-            using var connection = new SqlConnection(_connectionString);
-            connection.Open();
-
-            var command = new SqlCommand($"SELECT Count(Id) FROM EventSeat WHERE EventAreaId = 5", connection);
-            var result = (int)command.ExecuteScalar();
-
-            Assert.AreEqual(1, result);
-        }
-
-        [Test]
-        public void DeleteEvent_ShouldReturn_True()
-        {
-            using var connection = new SqlConnection(_connectionString);
-            connection.Open();
-
-            var command = new SqlCommand($"SELECT Count(Id) FROM Event WHERE DESCRIPTION = 'Joker' AND Id = 3 ", connection);
-
-            int eventExist = (int)command.ExecuteScalar();
-
-            Assert.AreEqual(0, eventExist);
-        }
-
-        [Test]
         public void AddEvent_ShouldReturn_RightCountOfEventAreas()
         {
             using var connection = new SqlConnection(_connectionString);
@@ -363,6 +327,69 @@ namespace TicketManagement.IntegrationTests
             }
 
             Assert.AreEqual(3, eventSeats[1].EventAreaId);
+        }
+
+        [Test]
+        public void UpdateEvent_ShouldReturn_UpdatedEventDescription()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+
+            var command = new SqlCommand($"SELECT Description FROM Event WHERE Id = 3", connection);
+            var eventDescriptions = new List<string>();
+
+            var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                eventDescriptions.Add(Convert.ToString(reader["Description"]));
+            }
+
+            Assert.AreEqual("Updated", eventDescriptions[0]);
+        }
+
+        [Test]
+        public void UpdateEvent_ShouldReturn_RightCountOfEventSeats()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+
+            var command = new SqlCommand($"SELECT Count(Id) FROM EventSeat WHERE EventAreaId = 5", connection);
+            var result = (int)command.ExecuteScalar();
+
+            Assert.AreEqual(1, result);
+        }
+
+        [Test]
+        public void DeleteEvent_ShouldReturn_True()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+
+            var command = new SqlCommand($"SELECT Count(Id) FROM Event WHERE DESCRIPTION = 'Joker' AND Id = 3 ", connection);
+
+            int eventExist = (int)command.ExecuteScalar();
+
+            Assert.AreEqual(0, eventExist);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _areaRepo.Dispose();
+                _eventAreaRepo.Dispose();
+                _eventSeatRepo.Dispose();
+                _venueRepo.Dispose();
+                _layoutRepo.Dispose();
+                _seatRepo.Dispose();
+                _context.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
