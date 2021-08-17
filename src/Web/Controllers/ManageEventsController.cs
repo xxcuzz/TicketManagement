@@ -27,6 +27,23 @@ namespace Web.Controllers
         }
 
         [HttpGet]
+        public IActionResult Add()
+        {
+            ViewBag.Layouts = new SelectList(_layoutService.GetAll(), "Id", "Description");
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Add(EditEventViewModel model)
+        {
+            var eventDto = _mapper.Map<EditEventViewModel, EventDto>(model);
+
+            await _eventService.CreateAsync(eventDto);
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             ViewBag.Layouts = new SelectList(_layoutService.GetAll(), "Id", "Description");
