@@ -65,6 +65,8 @@ namespace Web
             services.AddBllServices();
             services.AddRepositoryServices();
 
+            services.AddCors();
+
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<IdentityContext>();
@@ -90,6 +92,13 @@ namespace Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseCors(options =>
+            {
+                options.AllowAnyMethod();
+                options.AllowAnyHeader();
+                options.AllowAnyOrigin();
+            });
 
             app.UseRouting();
 
