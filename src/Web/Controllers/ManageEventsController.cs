@@ -67,5 +67,32 @@ namespace Web.Controllers
             await _eventService.UpdateAsync(eventDto);
             return RedirectToAction("Index", "Home");
         }
+
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var event1 = await _eventService.GetByIdAsync(id.Value);
+            var eventDto = _mapper.Map<EventDto, EditEventViewModel>(event1);
+
+            return View(eventDto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var event1 = await _eventService.GetByIdAsync(id);
+
+            if (event1 != null)
+            {
+                await _eventService.DeleteAsync(event1);
+                return RedirectToAction("Index", "Home");
+            }
+
+            return RedirectToAction("Error", "Home");
+        }
     }
 }

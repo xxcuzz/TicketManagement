@@ -46,8 +46,10 @@
             <td>
                 @if (User.IsInRole("Event Manager"))
                 {
+                <form asp-controller="ManageEvents" asp-action="Delete" asp-route-id="@item.Id" method="post">
                     <a class="btn btn-warning" asp-controller="ManageEvents" asp-action="Edit" asp-route-id="@item.Id">@localizer["Edit"]</a>
-                    <a class="btn btn-outline-danger" asp-controller="ManageEvents" asp-action="Delete" asp-route-id="@item.Id">×</a>
+                    <button class="btn btn-outline-danger" onclick="return confirm('Ary you sure you want to delete event : @item.Description')">x</button>
+                </form>
                 }
                 else
                 {
