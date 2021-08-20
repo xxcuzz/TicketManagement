@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -26,9 +27,11 @@ namespace Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(string errorMessage)
         {
-            var eventDtos = _eventService.GetAll();
+            ViewBag.ErrorMessage = errorMessage;
+
+            var eventDtos = _eventService.GetAll().Where(eventdto => eventdto.EventStart > DateTime.Now);
 
             var ivmList = eventDtos.Select(i => new IndexViewModel
             {
