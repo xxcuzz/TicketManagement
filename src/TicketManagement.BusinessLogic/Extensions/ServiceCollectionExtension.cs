@@ -19,7 +19,7 @@ namespace TicketManagement.BusinessLogic.Extensions
             services.AddScoped<IPurchaseService, PurchaseService>();
             services.AddScoped<ISeatService, SeatService>();
             services.AddScoped<IUserTicketService, UserTicketService>();
-            services.AddScoped<IService<LayoutDto>, LayoutService>();
+            services.AddScoped<ILayoutService, LayoutService>();
             services.AddScoped<IService<VenueDto>, VenueService>();
 
             return services;

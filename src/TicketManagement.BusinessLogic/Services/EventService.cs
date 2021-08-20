@@ -63,6 +63,11 @@ namespace TicketManagement.BusinessLogic.Services
 
         public async Task<bool> UpdateAsync(EventDto item)
         {
+            if (IsAnyEventSeatPurchased(item.Id))
+            {
+                return false;
+            }
+
             var event1 = _mapper.Map<EventDto, Event>(item);
             var layout = await _layoutRepo.GetByIdAsync(item.LayoutId);
 
@@ -80,6 +85,11 @@ namespace TicketManagement.BusinessLogic.Services
 
         public async Task<bool> DeleteAsync(EventDto item)
         {
+            if (IsAnyEventSeatPurchased(item.Id))
+            {
+                return false;
+            }
+
             var event1 = _mapper.Map<EventDto, Event>(item);
 
             return await _eventRepo.DeleteAsync(event1);
@@ -130,6 +140,18 @@ namespace TicketManagement.BusinessLogic.Services
         public IQueryable<Event> GetEventsInLayout(int layoutId)
         {
             return _eventRepo.GetAll().Where(e => e.LayoutId == layoutId);
+        }
+
+        public bool IsAnyEventSeatPurchased(int id)
+        {
+            var eventSeats = _eventSeatService.GetAllEventSeatsForEvent(id);
+
+            if (eventSeats.Any(seat => seat.State == 1))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

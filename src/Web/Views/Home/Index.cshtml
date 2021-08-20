@@ -1,18 +1,27 @@
 ﻿@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
 @model IEnumerable<Web.ViewModel.IndexViewModel>
 
+<!-- Error Alert -->
+@if (ViewData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @ViewData["ErrorMessage"]
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+}
+
 @if (User.IsInRole("Event Manager"))
 {
     <div style="display: inline">
-    <a asp-controller="ManageEvents" asp-action="Add" class="btn btn-outline-success" style="vertical-align:top">@localizer["Create Event"]</a>
+        <a asp-controller="ManageEvents" asp-action="Add" class="btn btn-outline-success" style="vertical-align:top">@localizer["Create Event"]</a>
 
-    <form id="importForm" method="post" enctype="multipart/form-data" style="display:inline" asp-controller="ThirdParty" asp-action="UploadEvents">
-        <label for="importFile" class="btn btn-outline-secondary">@localizer["Import events"]</label>
-        <div>
-            <input type="file" id="importFile" name="jsonFile" style="display: none">
-        </div>
-    </form>
-        </div>
+        <form id="importForm" method="post" enctype="multipart/form-data" style="display:inline" asp-controller="ThirdParty" asp-action="UploadEvents">
+            <label for="importFile" class="btn btn-outline-secondary">@localizer["Import events"]</label>
+            <div>
+                <input type="file" id="importFile" name="jsonFile" style="display: none">
+            </div>
+        </form>
+    </div>
 }
 
 <table class="table">
@@ -46,10 +55,10 @@
             <td>
                 @if (User.IsInRole("Event Manager"))
                 {
-                <form asp-controller="ManageEvents" asp-action="Delete" asp-route-id="@item.Id" method="post">
-                    <a class="btn btn-warning" asp-controller="ManageEvents" asp-action="Edit" asp-route-id="@item.Id">@localizer["Edit"]</a>
-                    <button class="btn btn-outline-danger" onclick="return confirm('Ary you sure you want to delete event : @item.Description')">x</button>
-                </form>
+                    <form asp-controller="ManageEvents" asp-action="Delete" asp-route-id="@item.Id" method="post">
+                        <a class="btn btn-warning" asp-controller="ManageEvents" asp-action="Edit" asp-route-id="@item.Id">@localizer["Edit"]</a>
+                        <button class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete event : @item.Description')">x</button>
+                    </form>
                 }
                 else
                 {

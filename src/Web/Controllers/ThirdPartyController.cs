@@ -19,12 +19,12 @@ namespace Web.Controllers
     {
         private readonly IWebHostEnvironment _env;
         private readonly IEventService _eventService;
-        private readonly IService<LayoutDto> _layoutService;
+        private readonly ILayoutService _layoutService;
         private readonly IMapper _mapper;
 
         public ThirdPartyController(IWebHostEnvironment env,
             IEventService eventService,
-            IService<LayoutDto> layoutService,
+            ILayoutService layoutService,
             IMapper mapper)
         {
             _env = env;

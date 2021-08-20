@@ -1,6 +1,7 @@
 ﻿@model Web.ViewModel.EditEventViewModel
-@using TicketManagement.BusinessLogic.EntitiesDTO
-@inject TicketManagement.BusinessLogic.Services.Interfaces.IService<LayoutDto> layoutService
+@inject TicketManagement.BusinessLogic.Services.Interfaces.ILayoutService layoutService
+@inject TicketManagement.BusinessLogic.Services.Interfaces.IAreaService areaService
+@inject TicketManagement.BusinessLogic.Services.Interfaces.IEventAreaService eventAreaService
 @inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
 
 @{
@@ -30,6 +31,7 @@
                     <option>Please select one</option>
                 </select>
             </div>
+
             <div class="form-group">
                 <label>@localizer["Image"]</label>
                 <input asp-for="Image" class="form-control" />

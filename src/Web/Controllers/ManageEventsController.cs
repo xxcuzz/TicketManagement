@@ -12,12 +12,12 @@ namespace Web.Controllers
     [Authorize(Roles = "Event Manager")]
     public class ManageEventsController : Controller
     {
-        private readonly IService<LayoutDto> _layoutService;
+        private readonly ILayoutService _layoutService;
         private readonly IEventService _eventService;
         private readonly IMapper _mapper;
 
         public ManageEventsController(
-            IService<LayoutDto> layoutService,
+            ILayoutService layoutService,
             IEventService eventService,
             IMapper mapper)
         {
@@ -46,28 +46,39 @@ namespace Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
-            ViewBag.Layouts = new SelectList(_layoutService.GetAll(), "Id", "Description");
-            if (id != null)
+            if (id == null)
             {
-                var eventDto = await _eventService.GetByIdAsync(id.Value);
-                if (eventDto != null)
-                {
-                    var model = _mapper.Map<EventDto, EditEventViewModel>(eventDto);
-                    return View(model);
-                }
+                return NotFound();
             }
 
-            return NotFound();
+            if (_eventService.IsAnyEventSeatPurchased(id.Value))
+            {
+                return RedirectToAction("Index", "Home", new { errorMessage = "Event with purchased seats cannot be changed." });
+            }
+
+            ViewBag.Layouts = new SelectList(_layoutService.GetAll(), "Id", "Description");
+
+            var eventDto = await _eventService.GetByIdAsync(id.Value);
+            if (eventDto != null)
+            {
+                var model = _mapper.Map<EventDto, EditEventViewModel>(eventDto);
+                return View(model);
+            }
+
+            return RedirectToAction("Error", "Home");
         }
 
         [HttpPost]
         public async Task<IActionResult> Edit(EditEventViewModel model)
         {
             var eventDto = _mapper.Map<EditEventViewModel, EventDto>(model);
+
             await _eventService.UpdateAsync(eventDto);
+
             return RedirectToAction("Index", "Home");
         }
 
+        [HttpPost]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -75,16 +86,12 @@ namespace Web.Controllers
                 return NotFound();
             }
 
+            if (_eventService.IsAnyEventSeatPurchased(id.Value))
+            {
+                return RedirectToAction("Index", "Home", new { errorMessage = "Event with purchased seats cannot be deleted." });
+            }
+
             var event1 = await _eventService.GetByIdAsync(id.Value);
-            var eventDto = _mapper.Map<EventDto, EditEventViewModel>(event1);
-
-            return View(eventDto);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var event1 = await _eventService.GetByIdAsync(id);
 
             if (event1 != null)
             {

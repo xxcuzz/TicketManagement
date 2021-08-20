@@ -10,7 +10,7 @@ using TicketManagement.DataAccess.InterfacesRepository;
 
 namespace TicketManagement.BusinessLogic.Services
 {
-    public class LayoutService : IService<LayoutDto>
+    public class LayoutService : ILayoutService
     {
         private readonly IRepository<Layout> _layoutRepo;
         private readonly IRepository<Venue> _venueRepo;
@@ -67,6 +67,17 @@ namespace TicketManagement.BusinessLogic.Services
         public IQueryable<Layout> GetLayoutsByVenueId(int venueId)
         {
             return _layoutRepo.GetAll().Where(l => l.VenueId == venueId);
+        }
+
+        public int GetLayoutIdByDescription(string description)
+        {
+            var layout = _layoutRepo.GetAll().Where(layout => layout.Description == description).FirstOrDefault();
+            if (layout == null)
+            {
+                return -1;
+            }
+
+            return layout.Id;
         }
     }
 }
