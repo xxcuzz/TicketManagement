@@ -161,16 +161,16 @@ namespace TicketManagement.DataAccess.Context
                         Description = "Joker",
                         LayoutId = layoutDto1.Id,
                         Name = "Cinema",
-                        EventStart = DateTime.Now,
-                        EventEnd = DateTime.Now.AddHours(2),
+                        EventStart = DateTime.Now.AddYears(1),
+                        EventEnd = DateTime.Now.AddYears(1).AddHours(2),
                     },
                     new Event
                     {
                         Description = "Inception",
                         LayoutId = layoutDto2.Id,
                         Name = "Cinema",
-                        EventStart = DateTime.Now.AddDays(2),
-                        EventEnd = DateTime.Now.AddHours(2).AddDays(2),
+                        EventStart = DateTime.Now.AddYears(100),
+                        EventEnd = DateTime.Now.AddYears(100).AddHours(2),
                     },
                 });
                 _ticketDbContext.SaveChanges();
