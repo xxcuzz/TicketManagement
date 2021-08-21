@@ -14,5 +14,8 @@ namespace Web.ViewModel
 
         [DisplayName("Ticket-Available")]
         public string TicketAvailable { get; set; }
+
+        [DisplayName("Image")]
+        public string ImageUrl { get; set; }
     }
 }

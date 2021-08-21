@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -13,11 +14,21 @@ namespace TicketManagement.BusinessLogic.Services
     {
         private readonly IMapper _mapper;
         private readonly IRepository<UserTicket> _userTicketRepo;
+        private readonly IEventSeatService _eventSeatService;
+        private readonly IEventAreaService _eventAreaService;
+        private readonly IEventService _eventService;
 
-        public UserTicketService(IRepository<UserTicket> userTicketRepo, IMapper mapper)
+        public UserTicketService(IRepository<UserTicket> userTicketRepo,
+            IMapper mapper,
+            IEventSeatService eventSeatService,
+            IEventAreaService eventAreaService,
+            IEventService eventService)
         {
             _userTicketRepo = userTicketRepo;
             _mapper = mapper;
+            _eventSeatService = eventSeatService;
+            _eventAreaService = eventAreaService;
+            _eventService = eventService;
         }
 
         public async Task<bool> CreateAsync(UserTicketDto item)
@@ -67,6 +78,35 @@ namespace TicketManagement.BusinessLogic.Services
         public IQueryable<UserTicket> GetTicketsForUser(string userId)
         {
             return _userTicketRepo.GetAll().Where(ticket => ticket.UserId == userId);
+        }
+
+        public async Task<bool> IsAnyTicketStillAvailable(string id)
+        {
+            var userTickets = GetAllTicketsForUser(id);
+
+            foreach (var ticket in userTickets)
+            {
+                var seat = await _eventSeatService.GetById(ticket.SeatId);
+                var area = await _eventAreaService.GetById(seat.EventAreaId);
+                var event1 = await _eventService.GetByIdAsync(area.EventId);
+
+                if (event1.EventStart > DateTime.Now)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public async Task DeteleAllTicketsForUser(string id)
+        {
+            var ticketsForUser = GetAllTicketsForUser(id);
+
+            foreach (var ticket in ticketsForUser)
+            {
+                await DeleteAsync(ticket);
+            }
         }
     }
 }

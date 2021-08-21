@@ -1,0 +1,64 @@
+﻿@model IEnumerable<ApplicationUser>
+
+@{
+    ViewBag.Title = "All Users";
+}
+
+<!-- Error Alert -->
+@if (ViewData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @ViewData["ErrorMessage"]
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+}
+
+@if (Model.Any())
+{
+    <h1>Users:</h1>
+    <table class="table">
+        <tr>
+            <th>
+                <label for="name">FirstName</label>
+            </th>
+            <th>
+                <label for="surname">Surname</label>
+            </th>
+            <th>
+                <label for="username">Username</label>
+            </th>
+            <th>
+                <label for="balance">Balance</label>
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(model => user.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => user.Surname)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => user.UserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => user.Balance)
+                </td>
+                <td>
+                    <form asp-controller="ManageVenues" asp-action="Delete" asp-route-id="@user.Id" method="post">
+                        <button class="btn btn-outline-danger" type="submit" onclick="return confirm('Are you sure you want to delete user : @user.UserName')">x</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </table>
+
+}
+else
+{
+    <h2>No users</h2>
+}

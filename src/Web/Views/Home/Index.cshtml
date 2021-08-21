@@ -51,6 +51,9 @@
             <td>
                 @Html.DisplayFor(modelItem => item.TicketAvailable)
             </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ImageUrl)
+            </td>
 
             <td>
                 @if (User.IsInRole("Event Manager"))

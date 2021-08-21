@@ -29,6 +29,11 @@ namespace Web.Controllers
         [HttpGet]
         public IActionResult Index(string errorMessage)
         {
+            if (User.IsInRole("Venue Manager"))
+            {
+                return RedirectToAction("Index", "ManageVenues");
+            }
+
             ViewBag.ErrorMessage = errorMessage;
 
             var eventDtos = _eventService.GetAll().Where(eventdto => eventdto.EventStart > DateTime.Now);
