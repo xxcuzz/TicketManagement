@@ -10,6 +10,8 @@ namespace TicketManagement.BusinessLogic.Services.Interfaces
 
         IEnumerable<EventAreaDto> GetAll();
 
+        Task<EventAreaDto> GetById(int id);
+
         IEnumerable<EventAreaDto> GetAllEventAreasForEvent(int eventId);
 
         Task<decimal> GetEventAreaPrice(int eventAreaId);

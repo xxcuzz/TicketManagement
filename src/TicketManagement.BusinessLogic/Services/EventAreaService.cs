@@ -50,5 +50,12 @@ namespace TicketManagement.BusinessLogic.Services
             var eventArea = await _eventAreaRepo.GetByIdAsync(eventAreaId);
             return eventArea.Price;
         }
+
+        public async Task<EventAreaDto> GetById(int id)
+        {
+            var eventAreaItem = await _eventAreaRepo.GetByIdAsync(id);
+            var eventAreaDto = _mapper.Map<EventSeat, EventSeatDto>(eventAreaItem);
+            return eventAreaDto;
+        }
     }
 }
